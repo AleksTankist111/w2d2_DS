@@ -36,7 +36,7 @@
 # <a id='SU' name="SU"></a>
 # ## [Task 2 and 3](#P0)
 
-# In[1]:
+# In[69]:
 
 
 import numpy as np
@@ -47,16 +47,16 @@ import logging
 import os
 
 
-# In[2]:
+# In[79]:
 
 
 orig_url = "https://drive.google.com/file/d/1AnzuM8RP-A9hQWkBPAqSCeLW7f79dC3N/view" # link goes here
 file_id = orig_url.split('/')[-2]
 data_path='https://drive.google.com/uc?export=download&id=' + file_id
-data = pd.read_csv(data_path)
+df = pd.read_csv(data_path, sep=';')
 
 
-# In[4]:
+# In[80]:
 
 
 TARGET_FEATURE = ['quality']
@@ -64,10 +64,10 @@ TRAIN_FEATURES = list(set(df.columns) - set(TARGET_FEATURE))
 print(f"Target:\n\t{TARGET_FEATURE}\n\nFeatures:\n\t{TRAIN_FEATURES}")
 
 
-# In[5]:
+# In[81]:
 
 
-get_ipython().magic(u'cd /content/drive/MyDrive/Introduction2DataScience/w2d2/')
+os.chdir(r'/content/drive/MyDrive/Introduction2DataScience/w2d2/')
 LOGGING_LEVEL = logging.INFO
 SCRIPT_NAME = 'w2d2_alexander_skakun_assignment'
 logging.basicConfig(filename=f'/content/drive/MyDrive/Introduction2DataScience/w2d2/{SCRIPT_NAME}.log', level=LOGGING_LEVEL)
@@ -83,19 +83,19 @@ def log(text):
 log('Data had been read')
 
 
-# In[7]:
+# In[82]:
 
 
 from sklearn.model_selection import train_test_split
 
 
-# In[8]:
+# In[83]:
 
 
 train, test = train_test_split(df, random_state=42, test_size=0.2)
 
 
-# In[9]:
+# In[84]:
 
 
 dup = df.duplicated(keep='first')
@@ -108,20 +108,20 @@ train, test = train_test_split(df_new, random_state=42, test_size=0.2)
 log(f"train shape:\t{train.shape}\ntest shape:\t{test.shape}")
 
 
-# In[10]:
+# In[76]:
 
 
 import seaborn as sns
 
 
-# In[17]:
-
-
-sns.pairplot(train)
-plt.savefig(os.path.join(IMAGE_FOLDER, 'pair-plot.png'))
-
-
 # In[ ]:
+
+
+#sns.pairplot(train)
+#plt.savefig(os.path.join(IMAGE_FOLDER, 'pair-plot.png'))
+
+
+# In[87]:
 
 
 log('Pair-plot had been saved')
@@ -135,7 +135,7 @@ for feature in TRAIN_FEATURES:
     log(f"{feature} : {temp.sum()}")    
 
 
-# In[23]:
+# In[88]:
 
 
 
@@ -160,7 +160,7 @@ plt.ylabel('Number of outliers')
 plt.savefig(os.path.join(IMAGE_FOLDER, 'outliers_distribution.png'))
 
 
-# In[19]:
+# In[89]:
 
 
 log('Outliers defined')
@@ -168,7 +168,7 @@ train = train[np.logical_not(outliers_matrix>=3)]
 log(f'New train set shape is {train.shape}')
 
 
-# In[22]:
+# In[90]:
 
 
 plt.figure(figsize=(16, 10))
@@ -182,7 +182,7 @@ plt.title('Confusion matrix (pearson corr. coef)')
 plt.savefig(os.path.join(IMAGE_FOLDER, 'confusion_matrix_pearson.png'))
 
 
-# In[25]:
+# In[91]:
 
 
 plt.figure(figsize=(16, 10))
@@ -196,7 +196,7 @@ plt.title('Confusion matrix (spearman corr. coef)')
 plt.savefig(os.path.join(IMAGE_FOLDER, 'confusion_matrix_spearman.png'))
 
 
-# In[28]:
+# In[92]:
 
 
 log('Confusion matices had been saved')
@@ -207,7 +207,7 @@ y_train = train[TARGET_FEATURE]
 y_test = test[TARGET_FEATURE]
 
 
-# In[29]:
+# In[93]:
 
 
 from sklearn.preprocessing import StandardScaler
@@ -217,7 +217,7 @@ x_train = scaler.fit_transform(x_train)
 x_test = scaler.transform(x_test)
 
 
-# In[31]:
+# In[94]:
 
 
 log('Scaling had been provided')
@@ -225,7 +225,7 @@ log('Scaling had been provided')
 
 # ### Pipeline Definition
 
-# In[34]:
+# In[95]:
 
 
 from sklearn.pipeline import Pipeline
@@ -261,47 +261,37 @@ plt.savefig(os.path.join(IMAGE_FOLDER, 'PredictionVSoriginal_plot.png'))
 
 # ### AutoML - Model Training
 
-# In[35]:
+# In[99]:
 
 
 import joblib
 
 
-# In[37]:
+# In[105]:
 
 
-import autosklearn.regression
-import PipelineProfiler
+automl = LinearRegression()
 
 
-# In[38]:
-
-
-automl = autosklearn.regression.AutoSklearnRegressor(
-    time_left_for_this_task=600,
-    per_run_time_limit=30,
-)
-
-
-# In[40]:
+# In[107]:
 
 
 automl.fit(x_train, y_train)
 
 
-# In[ ]:
+# In[108]:
 
 
 log('Model fitted successfully')
 
 
-# In[41]:
+# In[109]:
 
 
 joblib.dump(automl, open(os.path.join(MODEL_FOLDER, 'automl_model'), 'wb'))
 
 
-# In[ ]:
+# In[110]:
 
 
 log('Model saved')
